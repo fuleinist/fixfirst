@@ -1,0 +1,24 @@
+{
+  "name": "fixfirst",
+  "version": "1.0.0",
+  "description": "Repair-or-replace calculator for appliances: cost, carbon and a repair guide in one verdict.",
+  "type": "module",
+  "private": false,
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.6"
+  },
+  "scripts": {
+    "start": "node src/server.ts",
+    "dev": "node --watch src/server.ts",
+    "test": "node --test test/",
+    "cli": "node src/cli.ts"
+  },
+  "keywords": [
+    "repair",
+    "right-to-repair",
+    "carbon",
+    "appliances",
+    "circular-economy"
+  ]
+}
