@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en-AU">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>fixfirst — repair or replace?</title>
+    <meta
+      name="description"
+      content="A repair-or-replace calculator for appliances. It weighs the repair bill and embodied carbon against a new unit, then gives one verdict."
+    />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip" href="#result">Skip to the verdict</a>
+
+    <header class="site-header">
+      <a class="brand" href="/">
+        <img src="favicon.svg" alt="" width="30" height="30" />
+        <span>fixfirst</span>
+      </a>
+      <p class="tagline">Repair or replace? One answer, with the money and the carbon.</p>
+      <div class="header-actions">
+        <button type="button" id="shareBtn" class="ghost">Copy share link</button>
+        <button type="button" id="printBtn" class="ghost">Print report</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="card form-card" aria-labelledby="form-title">
+        <h1 id="form-title">Your appliance</h1>
+        <p class="lede">
+          Pick the appliance, the fault and its age. Add a repair quote if you have one.
+        </p>
+
+        <form id="calcForm" novalidate>
+          <div class="field">
+            <label for="appliance">Appliance</label>
+            <select id="appliance" name="appliance"></select>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="age">Age</label>
+              <div class="input-unit">
+                <input id="age" name="age" type="number" min="0" max="40" step="0.5" value="6" inputmode="decimal" />
+                <span>years</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="fault">Fault</label>
+              <select id="fault" name="fault"></select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="quote">Repair quote (A$)</label>
+            <input
+              id="quote"
+              name="quote"
+              type="number"
+              min="0"
+              step="10"
+              placeholder="Leave empty to use the catalog estimate"
+              inputmode="decimal"
+            />
+            <p class="hint" id="quoteHint"></p>
+          </div>
+
+          <details class="advanced">
+            <summary>Advanced</summary>
+            <div class="field">
+              <label for="tariff">Electricity price (A$ per kWh)</label>
+              <input id="tariff" name="tariff" type="number" min="0.05" max="1.5" step="0.01" value="0.33" />
+            </div>
+            <div class="field">
+              <label for="newPrice">New unit price (A$)</label>
+              <input
+                id="newPrice"
+                name="newPrice"
+                type="number"
+                min="0"
+                step="50"
+                placeholder="Use the catalog band"
+              />
+            </div>
+          </details>
+
+          <button type="submit" class="primary">Get the verdict</button>
+          <p class="error" id="error" role="alert" hidden></p>
+        </form>
+      </section>
+
+      <section class="card result-card" id="result" aria-live="polite" aria-busy="false">
+        <p class="empty">Checking the numbers…</p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>
+        Estimates only. Every catalog value is a range, not a quote.
+        Guide links come from <a href="https://www.ifixit.com" rel="noreferrer">iFixit</a> (CC BY-NC-SA).
+      </p>
+      <p class="mono">fixfirst · local only · no accounts · no tracking</p>
+    </footer>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

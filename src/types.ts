@@ -108,6 +108,9 @@ export interface CalcResult {
   fiveYearSaving: number;
   extensionYears: number;
   secondFailureRisk: number;
+  /** The repair bill at which the verdict flips. Null when no flip exists. */
+  breakEvenQuote: number | null;
+  advice: string;
   reasons: string[];
   warnings: string[];
 }

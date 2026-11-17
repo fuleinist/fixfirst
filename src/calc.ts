@@ -213,6 +213,46 @@ function decide(
 }
 
 export function calculate(rawInput: CalcInput): CalcResult {
+  const result = evaluate(rawInput);
+  const newPriceMid =
+    result.input.newPriceOverride ?? mid(result.appliance.newPrice[0], result.appliance.newPrice[1]);
+  const ceiling = Math.round(newPriceMid * REPAIR_PRICE_CEILING);
+  const breakEvenQuote = findBreakEven(rawInput, newPriceMid);
+
+  let advice: string;
+  if (result.verdict === "replace") {
+    advice = breakEvenQuote
+      ? `Keep the old unit only if the repair bill stays under A$${breakEvenQuote}.`
+      : `No repair bill makes this unit worth fixing.`;
+  } else if (result.verdict === "borderline") {
+    advice = breakEvenQuote
+      ? `Ask for a fixed quote. Repair wins below about A$${breakEvenQuote}.`
+      : `Ask for a fixed quote. The paths are close.`;
+  } else {
+    advice = `Repair stays the cheaper path up to a bill of about A$${ceiling}.`;
+  }
+
+  return { ...result, breakEvenQuote, advice };
+}
+
+/** The highest repair quote that still avoids a `replace` verdict. */
+function findBreakEven(input: CalcInput, newPriceMid: number): number | null {
+  const ceiling = Math.round(newPriceMid * REPAIR_PRICE_CEILING);
+  if (ceiling <= 0) return null;
+  if (evaluate({ ...input, quoteAud: 0 }).verdict === "replace") return null;
+  if (evaluate({ ...input, quoteAud: ceiling }).verdict !== "replace") return null;
+
+  let low = 0;
+  let high = ceiling;
+  for (let step = 0; step < 30; step += 1) {
+    const probe = (low + high) / 2;
+    if (evaluate({ ...input, quoteAud: probe }).verdict === "replace") high = probe;
+    else low = probe;
+  }
+  return Math.round(low);
+}
+
+function evaluate(rawInput: CalcInput): CalcResult {
   const appliance = findAppliance(rawInput.applianceId);
   if (!appliance) throw new CalcError(`Unknown appliance: ${rawInput.applianceId}`);
   const fault = findFault(rawInput.faultId);
@@ -309,6 +349,8 @@ export function calculate(rawInput: CalcInput): CalcResult {
     fiveYearSaving,
     extensionYears: Math.round(scenario.extensionYears * 10) / 10,
     secondFailureRisk: Math.round(scenario.secondFailureRisk * 100) / 100,
+    breakEvenQuote: null,
+    advice: "",
     reasons,
     warnings,
   };
